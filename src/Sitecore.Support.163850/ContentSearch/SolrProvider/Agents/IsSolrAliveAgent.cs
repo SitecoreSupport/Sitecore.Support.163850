@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sitecore.ContentSearch.SolrProvider.Agents
+namespace Sitecore.Support.ContentSearch.SolrProvider.Agents
 {
   using System;
   using System.Collections.Generic;
@@ -17,6 +17,8 @@ namespace Sitecore.ContentSearch.SolrProvider.Agents
   using Sitecore.Diagnostics;
   using Sitecore.StringExtensions;
   using Sitecore.Tasks;
+  using Sitecore.ContentSearch.SolrProvider;
+  using Sitecore.ContentSearch;
 
   // Got this class from one of support ticket on issue 391039.
   [UsedImplicitly]
@@ -85,8 +87,16 @@ namespace Sitecore.ContentSearch.SolrProvider.Agents
         {
           this.Log.Debug(" - Re-initializing index '{0}' ...".FormatWith(index.Name));
           index.Initialize();
-          this.Log.Debug(" - DONE");
-          reinitializedIndexes.Add(index);
+          // Sitecore.Support.163850
+          if ((index as SolrSearchIndex) == null)
+          {
+            Log.Debug(string.Format("Sitecore.Support.163850: '{0}' index is not SolrSearchIndex", index.Name));
+          }
+          else if ((index as SolrSearchIndex).IsInitialized)
+          {
+            this.Log.Debug(" - DONE");
+            reinitializedIndexes.Add(index);
+          }
         }
         catch (Exception ex)
         {
